@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../src/firebase";
+import { auth, db } from "../src/firebase"; // Ensure db is exported from firebase.js
+import { doc, getDoc } from "firebase/firestore";
 import {
   Box,
   Paper,
@@ -32,14 +33,32 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     const formData = new FormData(e.target);
     const email = formData.get("email");
     const password = formData.get("password");
 
     try {
+      // 🔐 Sign in with Firebase Auth
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/main");
+
+      // 🔎 Get user role from Firestore
+      const uid = auth.currentUser.uid;
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        if (userData.role === "admin") {
+          navigate("/main");
+        } else if (userData.role === "teacher") {
+          navigate("/teacher-dashboard");
+        } else {
+          setError("Unauthorized role. Contact admin.");
+        }
+      } else {
+        setError("User data not found. Please contact admin.");
+      }
     } catch (err) {
       console.error("Firebase login error:", err);
       setError(getErrorMessage(err.code));
@@ -188,7 +207,7 @@ const Login = () => {
                 <Button
                   variant="text"
                   sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                  onClick={() => navigate('/register')} // Adjust route as needed
+                  onClick={() => navigate('/register')}
                 >
                   Sign up here
                 </Button>
