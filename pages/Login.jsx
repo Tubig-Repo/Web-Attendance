@@ -200,19 +200,6 @@ const Login = () => {
                 'Sign In'
               )}
             </Button>
-
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                Don't have an account?{' '}
-                <Button
-                  variant="text"
-                  sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                  onClick={() => navigate('/register')}
-                >
-                  Sign up here
-                </Button>
-              </Typography>
-            </Box>
           </Box>
         </Paper>
       </Box>
