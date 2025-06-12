@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # Firebase API
-/src/firebase.js
+/src/.env
